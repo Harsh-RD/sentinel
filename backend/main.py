@@ -1,12 +1,14 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from database import engine, Base, get_db
+from routers import services, monitors
 import models
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from config import SECRET_KEY, ALGORITHM
 
 # Initialize DB
 models.Base.metadata.create_all(bind=engine)
@@ -21,8 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-SECRET_KEY = "supersecretkey_change_in_prod"
-ALGORITHM = "HS256"
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -76,3 +77,6 @@ def login(login_data: LoginData, db: Session = Depends(get_db)):
 @app.get("/api/health")
 def health_check():
     return {"status": "ok"}
+
+app.include_router(services.router)
+app.include_router(monitors.router)

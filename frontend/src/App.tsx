@@ -1,10 +1,13 @@
 import { useState } from 'react'
+import Services from './Services'
+import Monitors from './Monitors'
 
 function App() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [token, setToken] = useState<string | null>(null)
   const [error, setError] = useState('')
+  const [activeTab, setActiveTab] = useState('Dashboard')
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,16 +44,20 @@ function App() {
         </div>
         <div className="window-body">
           <menu role="tablist">
-            <li role="tab" aria-selected="true"><a href="#tabs">Dashboard</a></li>
-            <li role="tab"><a href="#tabs">Services</a></li>
-            <li role="tab"><a href="#tabs">Monitors</a></li>
-            <li role="tab"><a href="#tabs">Incidents</a></li>
-            <li role="tab"><a href="#tabs">Status Page</a></li>
+            {['Dashboard', 'Services', 'Monitors', 'Incidents', 'Status Page'].map(tab => (
+              <li role="tab" aria-selected={activeTab === tab} key={tab}>
+                <a href="#tabs" onClick={(e) => { e.preventDefault(); setActiveTab(tab) }}>{tab}</a>
+              </li>
+            ))}
           </menu>
           <div className="window" role="tabpanel">
             <div className="window-body">
-              <p>Welcome to Sentinel. You are authenticated.</p>
-              <button onClick={() => setToken(null)}>Logout</button>
+              {activeTab === 'Dashboard' && <p>Welcome to Sentinel. You are authenticated.</p>}
+              {activeTab === 'Services' && <Services token={token} />}
+              {activeTab === 'Monitors' && <Monitors token={token} />}
+              {activeTab === 'Incidents' && <p>Incidents coming soon...</p>}
+              {activeTab === 'Status Page' && <p>Status Page coming soon...</p>}
+              <button onClick={() => setToken(null)} style={{marginTop: '20px'}}>Logout</button>
             </div>
           </div>
         </div>
