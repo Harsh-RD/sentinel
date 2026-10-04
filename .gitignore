@@ -1,0 +1,27 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE
+.idea/
+.vscode/
+
+# Docker
+postgres_data/
+
+# MacOS
+.DS_Store
+
+# Frontend is in frontend/ folder which has its own gitignore, but let's ignore node_modules at root just in case
+node_modules/
+dist/
