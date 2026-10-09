@@ -17,7 +17,7 @@ app = FastAPI(title="Sentinel API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173", "http://localhost:3000", "http://localhost:3001"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -78,5 +78,11 @@ def login(login_data: LoginData, db: Session = Depends(get_db)):
 def health_check():
     return {"status": "ok"}
 
+from routers import services, monitors, incidents, operations, status, analytics
+
 app.include_router(services.router)
 app.include_router(monitors.router)
+app.include_router(incidents.router)
+app.include_router(operations.router)
+app.include_router(status.router)
+app.include_router(analytics.router)

@@ -55,32 +55,32 @@ def delete_monitor(monitor_id: int, db: Session = Depends(get_db)):
     db.delete(db_monitor)
     db.commit()
 
+from tasks import run_check
+
 @router.post("/{monitor_id}/test", dependencies=[Depends(require_operator)])
 def test_monitor(monitor_id: int, db: Session = Depends(get_db)):
     db_monitor = db.query(models.Monitor).filter(models.Monitor.id == monitor_id).first()
     if not db_monitor:
         raise HTTPException(status_code=404, detail="Monitor not found")
         
-    start = time.time()
-    try:
-        response = httpx.request(
-            db_monitor.method, 
-            db_monitor.url, 
-            timeout=db_monitor.timeout_seconds, 
-            follow_redirects=True
-        )
-        is_up = 200 <= response.status_code < 400
-        response_time_ms = int((time.time() - start) * 1000)
-        return {
-            "status_code": response.status_code,
-            "response_time_ms": response_time_ms,
-            "is_up": is_up,
-            "error_message": None
-        }
-    except Exception as e:
-        return {
-            "status_code": None,
-            "response_time_ms": None,
-            "is_up": False,
-            "error_message": str(e)
-        }
+    check_id = run_check(db, monitor_id)
+    if not check_id:
+        raise HTTPException(status_code=500, detail="Failed to run check")
+        
+    check_result = db.query(models.CheckResult).filter(models.CheckResult.id == check_id).first()
+    
+    return {
+        "status_code": check_result.status_code,
+        "response_time_ms": check_result.response_time_ms,
+        "is_up": check_result.is_up,
+        "error_message": check_result.error_message
+    }
+
+@router.get("/{monitor_id}/checks", response_model=List[schemas.CheckResult], dependencies=[Depends(require_viewer)])
+def get_monitor_checks(monitor_id: int, limit: int = 50, db: Session = Depends(get_db)):
+    db_monitor = db.query(models.Monitor).filter(models.Monitor.id == monitor_id).first()
+    if not db_monitor:
+        raise HTTPException(status_code=404, detail="Monitor not found")
+        
+    checks = db.query(models.CheckResult).filter(models.CheckResult.monitor_id == monitor_id).order_by(models.CheckResult.timestamp.desc()).limit(limit).all()
+    return checks

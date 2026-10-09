@@ -21,7 +21,7 @@ from models import Base
 target_metadata = Base.metadata
 
 def get_url():
-    return os.environ.get("DATABASE_URL", "postgresql+psycopg2://sentinel:password@localhost:5432/sentinel_db")
+    return os.environ.get("DATABASE_URL", "postgresql+psycopg2://sentinel:password@127.0.0.1:5433/sentinel_db")
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

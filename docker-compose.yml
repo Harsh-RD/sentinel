@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: password
       POSTGRES_DB: sentinel_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -37,6 +37,38 @@ services:
       redis:
         condition: service_started
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
+
+  celery_worker:
+    build:
+      context: ./backend
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://sentinel:password@db:5432/sentinel_db
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=supersecretkey_change_in_prod
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    command: celery -A celery_app worker --loglevel=info
+    volumes:
+      - ./backend:/app
+
+  celery_beat:
+    build:
+      context: ./backend
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://sentinel:password@db:5432/sentinel_db
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=supersecretkey_change_in_prod
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    command: celery -A celery_app beat --loglevel=info
     volumes:
       - ./backend:/app
 

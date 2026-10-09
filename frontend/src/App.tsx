@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import Services from './Services'
 import Monitors from './Monitors'
+import Dashboard from './Dashboard'
+import Incidents from './Incidents'
+import StatusPage from './StatusPage'
 
 function App() {
   const [email, setEmail] = useState('')
@@ -13,7 +16,7 @@ function App() {
     e.preventDefault()
     setError('')
     try {
-      const res = await fetch('http://localhost:8000/api/token', {
+      const res = await fetch('http://127.0.0.1:8000/api/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -52,11 +55,11 @@ function App() {
           </menu>
           <div className="window" role="tabpanel">
             <div className="window-body">
-              {activeTab === 'Dashboard' && <p>Welcome to Sentinel. You are authenticated.</p>}
+              {activeTab === 'Dashboard' && <Dashboard token={token} />}
               {activeTab === 'Services' && <Services token={token} />}
               {activeTab === 'Monitors' && <Monitors token={token} />}
-              {activeTab === 'Incidents' && <p>Incidents coming soon...</p>}
-              {activeTab === 'Status Page' && <p>Status Page coming soon...</p>}
+              {activeTab === 'Incidents' && <Incidents token={token} />}
+              {activeTab === 'Status Page' && <StatusPage />}
               <button onClick={() => setToken(null)} style={{marginTop: '20px'}}>Logout</button>
             </div>
           </div>

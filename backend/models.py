@@ -32,6 +32,7 @@ class Monitor(Base):
     method = Column(String, default="GET") # GET, POST
     interval_seconds = Column(Integer, default=60)
     timeout_seconds = Column(Integer, default=10)
+    failure_threshold = Column(Integer, default=3)
     consecutive_failures = Column(Integer, default=0)
     last_check_id = Column(Integer, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
