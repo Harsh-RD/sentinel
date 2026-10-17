@@ -52,6 +52,7 @@ def delete_monitor(monitor_id: int, db: Session = Depends(get_db)):
     db_monitor = db.query(models.Monitor).filter(models.Monitor.id == monitor_id).first()
     if not db_monitor:
         raise HTTPException(status_code=404, detail="Monitor not found")
+    db.query(models.CheckResult).filter(models.CheckResult.monitor_id == monitor_id).delete()
     db.delete(db_monitor)
     db.commit()
 

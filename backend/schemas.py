@@ -1,4 +1,4 @@
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, HttpUrl, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 
@@ -14,8 +14,7 @@ class Service(ServiceBase):
     id: int
     created_at: datetime
     updated_at: datetime
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class MonitorBase(BaseModel):
     name: str
@@ -37,8 +36,7 @@ class Monitor(MonitorBase):
     consecutive_failures: int
     created_at: datetime
     updated_at: datetime
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class CheckResult(BaseModel):
     id: int
@@ -48,9 +46,7 @@ class CheckResult(BaseModel):
     response_time_ms: Optional[int]
     is_up: bool
     error_message: Optional[str]
-    
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class IncidentCommentCreate(BaseModel):
     text: str
@@ -61,8 +57,7 @@ class IncidentComment(BaseModel):
     user_id: int
     text: str
     created_at: datetime
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class Incident(BaseModel):
     id: int
@@ -77,8 +72,7 @@ class Incident(BaseModel):
     acknowledged_by_user_id: Optional[int]
     mtta_seconds: Optional[float]
     mttr_seconds: Optional[float]
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class MaintenanceWindowCreate(BaseModel):
     service_id: int
@@ -89,5 +83,4 @@ class MaintenanceWindowCreate(BaseModel):
 class MaintenanceWindow(MaintenanceWindowCreate):
     id: int
     created_at: datetime
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

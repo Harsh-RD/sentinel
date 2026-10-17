@@ -25,7 +25,27 @@ def get_public_status(db: Session = Depends(get_db)):
             "name": s.name,
             "status": status
         })
+    recent_incidents = (
+        db.query(models.Incident)
+        .order_by(models.Incident.created_at.desc())
+        .limit(10)
+        .all()
+    )
+    incident_list = [
+        {
+            "id": inc.id,
+            "service_id": inc.service_id,
+            "status": inc.status,
+            "severity": inc.severity,
+            "summary": inc.summary or f"Incident #{inc.id}",
+            "created_at": inc.created_at.isoformat() if inc.created_at else None,
+            "resolved_at": inc.resolved_at.isoformat() if inc.resolved_at else None,
+        }
+        for inc in recent_incidents
+    ]
     return {
         "overall": overall,
-        "services": results
+        "global_status": overall,
+        "services": results,
+        "recent_incidents": incident_list,
     }

@@ -39,5 +39,11 @@ def delete_service(service_id: int, db: Session = Depends(get_db)):
     db_service = db.query(models.Service).filter(models.Service.id == service_id).first()
     if not db_service:
         raise HTTPException(status_code=404, detail="Service not found")
+    monitors = db.query(models.Monitor).filter(models.Monitor.service_id == service_id).all()
+    for m in monitors:
+        db.query(models.CheckResult).filter(models.CheckResult.monitor_id == m.id).delete()
+        db.delete(m)
+    db.query(models.Incident).filter(models.Incident.service_id == service_id).delete()
+    db.query(models.MaintenanceWindow).filter(models.MaintenanceWindow.service_id == service_id).delete()
     db.delete(db_service)
     db.commit()
